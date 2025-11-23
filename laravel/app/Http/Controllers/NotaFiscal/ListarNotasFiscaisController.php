@@ -12,9 +12,9 @@ class ListarNotasFiscaisController extends Controller
     public function __invoke(): Factory|View
     {
         $notasFiscais = NotaFiscal::with('estabelecimento')
-            ->orderBy('data_emissao', 'desc') // Ordena da mais recente para a mais antiga
+            ->orderBy('data_emissao', 'desc')
             ->orderBy('hora_emissao', 'desc')
-            ->paginate(15); // Define 15 notas por página
+            ->paginate(15);
 
         // 2. Retorna a View, passando o objeto paginado
         return view('receipt.list', compact('notasFiscais'));
