@@ -1,9 +1,10 @@
 <?php
 
-namespace App\Http\Controllers;
+namespace App\Http\Controllers\NotaFiscal;
 
 use App\Exceptions\NotaJaExistente;
 use App\Gateways\SaveReceiptDataGateway;
+use App\Http\Controllers\Controller;
 use App\Services\OcrService;
 use Exception;
 use Illuminate\Http\RedirectResponse;

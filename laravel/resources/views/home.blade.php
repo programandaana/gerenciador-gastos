@@ -3,8 +3,26 @@
 @section('title', 'Painel de Controle')
 
 @section('content')
-    <h1>Página Inicial</h1>
-    <p>Selecione uma das opções abaixo.</p>
-    <a href="/relatorio" class="btn">Exibir Relatório</a>
-    <a href="{{ route('view.receipt.upload') }}" class="btn btn-secondary">Enviar Arquivo</a>
+    <div class="row">
+
+        <div class="col-sm-6 mb-3 mb-sm-0">
+            <div class="card">
+                <div class="card-body">
+                    <h5 class="card-title">Enviar Nota</h5>
+                    <p class="card-text">With supporting text below as a natural lead-in to additional content.</p>
+                    <a href="#" class="btn btn-primary">Go somewhere</a>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-sm-6">
+            <div class="card">
+                <div class="card-body">
+                    <h5 class="card-title">Realtórios</h5>
+                    <p class="card-text">With supporting text below as a natural lead-in to additional content.</p>
+                    <a href="#" class="btn btn-primary">Go somewhere</a>
+                </div>
+            </div>
+        </div>
+    </div>
 @endsection
