@@ -4,6 +4,7 @@
 
 @section('content')
     <div class="container-fluid">
+        <br>
         <h2 style="font-size: 150%">Enviar Nota Fiscal</h2>
         <p>Selecione um arquivo para enviar.</p>
 
