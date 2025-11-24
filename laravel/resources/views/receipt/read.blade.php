@@ -85,7 +85,5 @@
                 Nota fiscal não encontrada.
             </div>
         @endif
-
-
     </div>
 @endsection
