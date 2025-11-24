@@ -30,7 +30,7 @@
                 ❌ Erro: {{ session('error') }}
             </div>
         @endif
-        <form action="{{ route('receipt.upload') }}" method="POST" enctype="multipart/form-data">
+        <form action="{{ route('receipt.upload') }}" method="POST" enctype="multipart/form-data" data-receipt-upload-url="{{ route('receipt.upload') }}">
             @csrf
             <div class="form-group">
                 <label for="arquivo" class="form-label">Selecione o arquivo:</label>

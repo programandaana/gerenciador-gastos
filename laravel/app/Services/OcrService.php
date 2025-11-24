@@ -6,6 +6,7 @@ use App\DTOs\OcrResultDTO;
 use Exception;
 use Illuminate\Http\UploadedFile;
 use Illuminate\Support\Facades\Http;
+use Illuminate\Support\Facades\Storage;
 
 class OcrService
 {
@@ -28,10 +29,15 @@ class OcrService
     /**
      * @throws Exception
      */
-    public function extrairDados(UploadedFile $imageFile): OcrResultDTO
+    public function extrairDados(string $filePath): OcrResultDTO
     {
-        $imageData = base64_encode(file_get_contents($imageFile->getRealPath()));
-        $mimeType = $imageFile->getMimeType();
+        // Certifique-se de que o disco 'private' está configurado e que o arquivo existe
+        if (!Storage::disk('private')->exists($filePath)) {
+            throw new Exception("Arquivo de imagem não encontrado no caminho: " . $filePath);
+        }
+
+        $imageData = base64_encode(Storage::disk('private')->get($filePath));
+        $mimeType = Storage::disk('private')->mimeType($filePath);
 
         // 1. Schema JSON string (simplificado para o prompt)
         // app/Services/OcrService.php (Substituir o array que gera o $schemaJsonString)
