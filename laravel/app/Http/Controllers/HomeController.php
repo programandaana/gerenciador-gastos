@@ -15,9 +15,26 @@ class HomeController extends Controller
     {
         return view('home',
             [
-                'relatorio_categoria_pizza' => $this->dadosGraficoCategoriaPizza()
+                'relatorio_categoria_pizza' => $this->dadosGraficoCategoriaPizza(),
+                'itensRecentes' => $this->extratoRecente(),
             ]
         );
+
+    }
+
+    private function extratoRecente()
+    {
+        return ItemDaCompra::with(['notaFiscal', 'categoria'])
+            ->join(
+                'notas_fiscais',
+                'itens_da_compra.nota_fiscal_id',
+                '=',
+                'notas_fiscais.id'
+            )
+            ->select('itens_da_compra.*') // Seleciona todas as colunas de item_da_compra
+            ->orderBy('notas_fiscais.data_emissao', 'desc')
+            ->orderBy('notas_fiscais.hora_emissao', 'desc')
+            ->paginate(10);
 
     }
 

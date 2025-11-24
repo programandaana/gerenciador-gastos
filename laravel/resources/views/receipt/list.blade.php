@@ -33,8 +33,8 @@
                         <td class="text-right">R$ {{ number_format($nota->valor_pago, 2, ',', '.') }}</td>
                         <td class="text-center">
                             {{-- Link para a listagem detalhada que criamos anteriormente --}}
-                            <a href="" class="btn btn-sm btn-info">
-                                Ver Detalhes
+                            <a href="{{route('view.receipt.read', $nota->id)}}" class="btn btn-sm btn-success">
+                                <i class="bi bi-card-checklist"></i> Ver Detalhes
                             </a>
                         </td>
                     </tr>

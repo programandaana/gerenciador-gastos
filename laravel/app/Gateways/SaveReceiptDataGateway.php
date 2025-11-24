@@ -34,7 +34,11 @@ class SaveReceiptDataGateway
             // 2. Cria a Nota Fiscal (incluindo campos legais)
             $notaFiscal = NotaFiscal::create([
                 'estabelecimento_id' => $estabelecimento->id,
-                'chave_acesso'       => $dto->chaveAcesso,
+                'chave_acesso'       => preg_replace(
+                    '/\D/',
+                    '',
+                    $dto->chaveAcesso
+                ),
                 'data_emissao'       => $dto->dataEmissao,
                 'hora_emissao'       => $dto->horaEmissao,
                 'total_bruto'        => $dto->totalBruto,
