@@ -1,9 +1,11 @@
+@php use Carbon\Carbon; @endphp
 <div>
     <div class="row">
         <div class="col-md-6">
             <div class="card mb-4">
                 <div class="card-header">
-                    Total Gasto no Mês
+                    Total Gasto de {{ Carbon::parse($dataInicio)->format('d/m/Y') }}
+                    a {{ Carbon::parse($dataFim)->format('d/m/Y') }}
                 </div>
                 <div class="card-body">
                     <h1>
@@ -28,7 +30,8 @@
 @push('scripts')
     <script src="https://cdn.jsdelivr.net/npm/chart.js@3.7.1/dist/chart.min.js"></script>
 
-    <script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-datalabels@2.0.0/dist/chartjs-plugin-datalabels.min.js"></script>
+    <script
+        src="https://cdn.jsdelivr.net/npm/chartjs-plugin-datalabels@2.0.0/dist/chartjs-plugin-datalabels.min.js"></script>
 
     <script>
         Chart.register(ChartDataLabels);
@@ -39,7 +42,7 @@
         // Gera cores aleatórias para o gráfico (opcional, mas recomendado para pizza)
         function generateColors(count) {
             let colors = [];
-            for(let i = 0; i < count; i++) {
+            for (let i = 0; i < count; i++) {
                 colors.push('hsl(' + Math.random() * 360 + ', 70%, 50%)');
             }
             return colors;

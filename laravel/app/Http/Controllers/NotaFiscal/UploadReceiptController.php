@@ -41,6 +41,12 @@ class UploadReceiptController extends Controller
             // 2. Extração de Dados (chama o Service)
             $ocrResultDTO = $ocrService->extrairDados($imageFile);
 
+            if (strlen($ocrResultDTO->chaveAcesso) != 44) {
+                return redirect()->back()->withErrors(
+                    ['Não foi possível extrair a chave de acesso da nota.']
+                )->withInput();
+            }
+
             // 3. Persistência de Dados (chama o Gateway)
             $notaFiscal = $gateway->execute($ocrResultDTO);
 

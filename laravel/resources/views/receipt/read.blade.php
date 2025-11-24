@@ -48,7 +48,7 @@
 
             <h2 style="font-size: 150%" class="mt-4">Itens da Compra ({{ $notaFiscal->itens->count() }} itens)</h2>
 
-            <div style="overflow-y: scroll">
+            <div class="card" style="overflow-y: scroll">
 
                 <table class="table table-bordered table-striped">
                     <thead class="table-dark">
