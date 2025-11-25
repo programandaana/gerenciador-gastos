@@ -21,7 +21,7 @@ return new class extends Migration
                 ->onDelete('cascade');
 
             // Dados da transação
-            $table->string('chave_acesso', 44)->unique()->after('numero_doc');
+            $table->string('chave_acesso', 44)->unique();
             $table->date('data_emissao'); // Ex: 30/10/2025
             $table->time('hora_emissao'); // Ex: 18:25:41
 

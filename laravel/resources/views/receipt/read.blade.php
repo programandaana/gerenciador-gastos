@@ -24,7 +24,6 @@
                             <p><strong>Endereço:</strong> {{ $notaFiscal->estabelecimento->endereco ?? 'Não Informado' }}</p>
                             <hr>
                             <p><strong>Data da Compra:</strong> {{ date('d/m/Y', strtotime($notaFiscal->data_emissao)) }} às {{ date('H:i:s', strtotime($notaFiscal->hora_emissao)) }}</p>
-                            <p><strong>Número do Doc/Cupom:</strong> {{ $notaFiscal->numero_doc }}</p>
                         </div>
                     </div>
                 </div>
