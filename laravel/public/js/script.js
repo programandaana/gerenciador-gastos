@@ -116,6 +116,7 @@ document.addEventListener('DOMContentLoaded', () => {
                     method: 'POST',
                     body: formData,
                     headers: {
+                        'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]')?.getAttribute('content'),
                         'Accept': 'application/json', // Expect JSON response
                     }
                 });
@@ -127,10 +128,19 @@ document.addEventListener('DOMContentLoaded', () => {
 
                 const data = await response.json();
 
+                console.log('Dados recebidos após o upload:', data); // DEBUG
+
                 if (response.ok) {
-                    if (data.success) {
+                    if (data.success && data.job_status_uuid) {
                         showToast(data.success, 'success');
                         // Optionally clear the file input
+                        const fileInput = uploadForm.querySelector('input[type="file"]');
+                        if (fileInput) fileInput.value = '';
+
+                        // Start polling for job status
+                        startPollingForJobStatus(data.job_status_uuid);
+                    } else if (data.success) { // Handle success without job_status_uuid
+                        showToast(data.success, 'success');
                         const fileInput = uploadForm.querySelector('input[type="file"]');
                         if (fileInput) fileInput.value = '';
                     } else if (data.error) {
@@ -157,6 +167,8 @@ document.addEventListener('DOMContentLoaded', () => {
                 console.error('Erro ao enviar o arquivo:', error);
                 showToast('Erro de rede ou ao enviar o arquivo.', 'error');
             } finally {
+                // Submit button is re-enabled once the initial response is received
+                // The final status will be shown via polling.
                 if (submitButton) {
                     submitButton.disabled = false;
                     submitButton.textContent = 'Enviar';
@@ -164,4 +176,188 @@ document.addEventListener('DOMContentLoaded', () => {
             }
         });
     }
+
+    // Function to start polling for job status
+    function startPollingForJobStatus(jobStatusUuid) {
+        const pollInterval = 3000; // Poll every 3 seconds
+        let pollingAttempts = 0;
+        const maxPollingAttempts = 60; // Max 60 attempts = 3 minutes
+
+        const intervalId = setInterval(async () => {
+            pollingAttempts++;
+
+            if (pollingAttempts > maxPollingAttempts) {
+                clearInterval(intervalId);
+                showToast('O processamento do arquivo demorou muito e a verificação de status foi interrompida. Por favor, verifique mais tarde.', 'warning');
+                return;
+            }
+
+            try {
+                console.log('Iniciando polling para UUID:', jobStatusUuid); // DEBUG
+                const response = await fetch(`/job-status/${jobStatusUuid}`);
+                const jobStatus = await response.json();
+
+                if (response.ok && jobStatus && jobStatus.status) {
+                    if (jobStatus.status === 'completed') {
+                        clearInterval(intervalId);
+                        showToast(jobStatus.message, 'success');
+                    } else if (jobStatus.status === 'failed') {
+                        clearInterval(intervalId);
+                        showToast(jobStatus.message, 'error');
+                    } else {
+                        // Job is still pending or processing, continue polling
+                        // Optionally update a "processing" toast here if desired
+                        // showToast(`Status: ${jobStatus.status}...`, 'info'); // Could be noisy
+                    }
+                } else {
+                    // Handle API errors for job status
+                    clearInterval(intervalId);
+                    showToast('Erro ao verificar o status do processamento.', 'error');
+                }
+            } catch (error) {
+                clearInterval(intervalId);
+                console.error('Erro ao buscar status do job:', error);
+                showToast('Erro de rede ao verificar o status do processamento.', 'error');
+            }
+        }, pollInterval);
+    }
+
+    const checkStatusBtn = document.getElementById('checkStatusBtn');
+    const statusModal = new bootstrap.Modal(document.getElementById('statusModal'));
+    const statusModalBody = document.getElementById('statusModalBody');
+    const statusCount = document.getElementById('statusCount');
+
+    function updateStatusCount(statuses) {
+        // Agora conta todos os status, já que não temos mais o campo 'lido'
+        const totalCount = statuses.length;
+        if (totalCount > 0) {
+            statusCount.textContent = totalCount;
+            statusCount.style.display = '';
+        } else {
+            statusCount.style.display = 'none';
+        }
+    }
+
+
+    document.getElementById('statusModal').addEventListener('hidden.bs.modal', async () => {
+        try {
+            const response = await fetch('/job-status');
+            const statuses = await response.json();
+            // A notificação será marcada como lida apenas ao fechar o modal
+            // const finalUnreadStatuses = statuses.filter(s =>
+            //     (s.status === 'completed' || s.status === 'failed') && !s.lido
+            // );
+
+            // for (const status of finalUnreadStatuses) {
+            //     await markAsRead(status.uuid);
+            // }
+            // After marking all as read, fetch again to update the count and modal content
+            fetchJobStatuses();
+        } catch (error) {
+            console.error('Erro ao marcar notificações como lidas ao fechar o modal:', error);
+        }
+    });
+
+    async function fetchJobStatuses() {
+        try {
+            const response = await fetch('/job-status');
+            const statuses = await response.json();
+            // console.log('Status recebidos do backend:', statuses); // Removido o LOG
+            updateStatusModal(statuses);
+            updateStatusCount(statuses);
+        } catch (error) {
+            console.error('Erro ao buscar status:', error);
+        }
+    }
+
+    function updateStatusModal(statuses) {
+        statusModalBody.innerHTML = '';
+
+        if (statuses.length === 0) {
+            statusModalBody.innerHTML = '<p>Nenhum processamento recente.</p>';
+            return;
+        }
+
+        const statusTranslations = {
+            'failed': 'Falha',
+            'completed': 'Concluído',
+            'processing': 'Processando',
+            'pending': 'Pendente'
+        };
+
+        statuses.forEach(status => {
+            const translatedStatus = statusTranslations[status.status] || status.status; // Usa a tradução ou o original se não encontrar
+
+            const statusElement = document.createElement('div');
+            statusElement.classList.add('alert', 'd-flex', 'justify-content-between', 'align-items-center'); // Added flex classes
+            statusElement.setAttribute('data-uuid', status.uuid); // Add uuid to element for easier targeting
+
+            let statusClass = 'alert-info';
+            if (status.status === 'completed') statusClass = 'alert-success';
+            if (status.status === 'failed') statusClass = 'alert-danger';
+            statusElement.classList.add(statusClass);
+            statusElement.innerHTML = `
+                <div>
+                    <p class="mb-0"><strong>Status:</strong> ${translatedStatus}</p>
+                    <p class="mb-0">${status.message}</p>
+                    <small class="text-muted">${new Date(status.created_at).toLocaleString()}</small>
+                </div>
+                ${(status.status === 'completed' || status.status === 'failed') ? `<button type="button" class="btn btn-sm btn-lg confirm-read-btn" data-uuid="${status.uuid}">
+                    <i class="bi bi-check2-square"></i>
+                </button>` : ''}
+            `;
+            statusModalBody.appendChild(statusElement);
+        });
+    }
+
+    // Nova função para confirmar leitura e remover
+    async function confirmReadStatusAndRemove(uuid) {
+        if (!confirm('Tem certeza que deseja confirmar a leitura desta notificação?')) {
+            return;
+        }
+        try {
+            const response = await fetch(`/job-status/${uuid}`, {
+                method: 'DELETE',
+                headers: {
+                    'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]')?.getAttribute('content'),
+                    'Accept': 'application/json',
+                }
+            });
+
+            if (response.ok) {
+                showToast('Leitura confirmada com sucesso!', 'success');
+                fetchJobStatuses(); // Atualiza a lista após a exclusão
+            } else {
+                const errorData = await response.json();
+                showToast(`Erro ao confirmar leitura: ${errorData.message || 'Erro desconhecido'}`, 'error');
+            }
+        } catch (error) {
+            console.error(`Erro ao confirmar leitura e remover status ${uuid}:`, error);
+            showToast('Erro de rede ao confirmar leitura.', 'error');
+        }
+    }
+
+    // Listener para o clique no botão de confirmar leitura
+    statusModalBody.addEventListener('click', (event) => {
+        const target = event.target.closest('.confirm-read-btn');
+        if (target) {
+            const uuid = target.dataset.uuid;
+            if (uuid) {
+                confirmReadStatusAndRemove(uuid);
+            }
+        }
+    });
+
+
+    if (checkStatusBtn) {
+        checkStatusBtn.addEventListener('click', () => {
+            fetchJobStatuses();
+            statusModal.show();
+        });
+    }
+
+    // Periodically check for new statuses
+    setInterval(fetchJobStatuses, 10000); // Check every 10 seconds
+    // Initial check
+    fetchJobStatuses();
 });

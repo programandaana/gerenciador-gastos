@@ -10,8 +10,7 @@
                     <h5 class="card-title">Gastos do mês</h5>
                     <div>
                         @include('relatorios.categoria_pizza')
-                    </div>
-                    <a href="#" class="btn btn-primary">Go somewhere</a>
+                    <a href="#" class="btn btn-primary">Ver detalhes</a>
                 </div>
             </div>
         </div>
@@ -20,8 +19,8 @@
             <div class="card">
                 <div class="card-body">
                     <h5 class="card-title">Relatórios</h5>
-                    <p class="card-text">With supporting text below as a natural lead-in to additional content.</p>
-                    <a href="#" class="btn btn-primary">Go somewhere</a>
+                    <p class="card-text">Visualize relatórios detalhados sobre seus gastos.</p>
+                    <a href="#" class="btn btn-primary">Ver relatórios</a>
                 </div>
             </div>
         </div>

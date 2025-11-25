@@ -3,6 +3,7 @@
 namespace App\Services;
 
 use App\DTOs\OcrResultDTO;
+use App\Exceptions\GeminiQuotaExceededException; // Import the custom exception
 use Exception;
 use Illuminate\Http\UploadedFile;
 use Illuminate\Support\Facades\Http;
@@ -38,9 +39,6 @@ class OcrService
 
         $imageData = base64_encode(Storage::disk('private')->get($filePath));
         $mimeType = Storage::disk('private')->mimeType($filePath);
-
-        // 1. Schema JSON string (simplificado para o prompt)
-        // app/Services/OcrService.php (Substituir o array que gera o $schemaJsonString)
 
         // 1. Define o Schema JSON que será injetado no prompt
         $schemaArray = [
@@ -101,7 +99,6 @@ class OcrService
                     ],
                 ],
             ],
-            // 'config' removido para evitar o erro HTTP 400.
         ];
 
         try {
@@ -109,7 +106,15 @@ class OcrService
             $response = Http::timeout(90)->post("{$this->url}?key={$this->apiKey}", $requestBody);
 
             if ($response->failed()) {
-                throw new Exception("Erro HTTP da API Gemini: Status {$response->status()} - " . $response->body());
+                $statusCode = $response->status();
+                $responseBody = $response->body();
+
+                // Check for quota exceeded status (e.g., HTTP 429 or specific message)
+                if ($statusCode === 429 || str_contains($responseBody, 'quota exceeded') || str_contains($responseBody, 'rate limit')) {
+                    throw new GeminiQuotaExceededException();
+                }
+
+                throw new Exception("Erro HTTP da API Gemini: Status {$statusCode} - " . $responseBody);
             }
 
             // 4. Extração do texto JSON e decodificação
@@ -132,6 +137,8 @@ class OcrService
 
             return new OcrResultDTO($jsonResponse);
 
+        } catch (GeminiQuotaExceededException $e) {
+            throw $e; // Re-throw the specific exception
         } catch (Exception $e) {
             throw new Exception("Falha na extração OCR via Gemini: " . $e->getMessage());
         }

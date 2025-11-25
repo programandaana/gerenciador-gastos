@@ -14,6 +14,8 @@ use Illuminate\Support\Facades\Log;
 use Illuminate\Validation\ValidationException;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Support\Facades\Storage; // Adicionado para manipulação de arquivos
+use App\Models\JobStatus; // Adicionado
+use Illuminate\Support\Str; // Adicionado para UUID
 
 class UploadReceiptController extends Controller
 {
@@ -42,13 +44,23 @@ class UploadReceiptController extends Controller
             // Salva o arquivo temporariamente e obtém o caminho
             $path = $imageFile->store('receipt_uploads', 'private'); // 'private' disk para arquivos temporários
 
-            // Despacha o job para processar em segundo plano
-            ProcessReceiptJob::dispatch($path);
+            // Cria um registro de status do job
+            $jobStatus = JobStatus::create([
+                'uuid' => (string) Str::uuid(),
+                'status' => 'pending',
+                'message' => 'Arquivo recebido e aguardando processamento.',
+            ]);
 
-            $mensagemSucesso = "Arquivo enviado para processamento em segundo plano. Você será notificado sobre o resultado.";
+            // Despacha o job para processar em segundo plano, passando o UUID do jobStatus
+            ProcessReceiptJob::dispatch($path, $jobStatus->uuid);
+
+            $mensagemSucesso = "Arquivo enviado para processamento em segundo plano. Você pode acompanhar o status.";
 
             if ($request->wantsJson()) {
-                return response()->json(['success' => $mensagemSucesso]);
+                return response()->json([
+                    'success' => $mensagemSucesso,
+                    'job_status_uuid' => $jobStatus->uuid
+                ]);
             }
 
             return redirect()->route('view.receipt.upload')->with('success', $mensagemSucesso);

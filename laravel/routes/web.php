@@ -4,6 +4,7 @@ use App\Http\Controllers\HomeController;
 use App\Http\Controllers\NotaFiscal\ListarNotasFiscaisController;
 use App\Http\Controllers\NotaFiscal\UploadReceiptController;
 use Illuminate\Support\Facades\Route;
+use App\Http\Controllers\JobStatusController; // Adicionado
 
 /*
  * Views
@@ -20,5 +21,10 @@ Route::get('receipt/upload', fn() => view('receipt.upload'))
 Route::post('receipt', UploadReceiptController::class)->name('receipt.upload');
 Route::get('notas-fiscais', ListarNotasFiscaisController::class)
     ->name('view.receipt.list');
+
+// Job Status API
+Route::get('job-status/{uuid}', [JobStatusController::class, 'show'])->name('job.status.show');
+Route::get('job-status', [JobStatusController::class, 'index'])->name('job.status.index');
+Route::delete('job-status/{uuid}', [JobStatusController::class, 'destroy'])->name('job.status.destroy');
 
 // Relatórios
