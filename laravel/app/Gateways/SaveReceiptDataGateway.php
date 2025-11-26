@@ -16,7 +16,7 @@ class SaveReceiptDataGateway
     {
         return DB::transaction(function () use ($dto) {
 
-            if (NotaFiscal::where('chave_acesso', $dto->chaveAcesso)->exists()) {
+            if (NotaFiscal::where('chave_acesso', preg_replace('/\D/', '', $dto->chaveAcesso))->exists()) {
                 throw new NotaJaExistente("Esta nota fiscal já foi processada. Chave de Acesso ({$dto->chaveAcesso}) duplicada.");
             }
 

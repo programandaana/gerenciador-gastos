@@ -34,7 +34,7 @@
                     <h5 class="card-title">Gastos do Período</h5>
                     <div>
                         @include('relatorios.categoria_pizza')
-                    <a href="#" class="btn btn-primary">Ver detalhes</a>
+                    </div>
                 </div>
             </div>
         </div>
