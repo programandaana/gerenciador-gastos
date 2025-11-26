@@ -128,8 +128,6 @@ document.addEventListener('DOMContentLoaded', () => {
 
                 const data = await response.json();
 
-                console.log('Dados recebidos após o upload:', data); // DEBUG
-
                 if (response.ok) {
                     if (data.success && data.job_status_uuid) {
                         showToast(data.success, 'success');
@@ -193,7 +191,6 @@ document.addEventListener('DOMContentLoaded', () => {
             }
 
             try {
-                console.log('Iniciando polling para UUID:', jobStatusUuid); // DEBUG
                 const response = await fetch(`/job-status/${jobStatusUuid}`);
                 const jobStatus = await response.json();
 
@@ -228,7 +225,6 @@ document.addEventListener('DOMContentLoaded', () => {
     const statusCount = document.getElementById('statusCount');
 
     function updateStatusCount(statuses) {
-        // Agora conta todos os status, já que não temos mais o campo 'lido'
         const totalCount = statuses.length;
         if (totalCount > 0) {
             statusCount.textContent = totalCount;
@@ -241,17 +237,6 @@ document.addEventListener('DOMContentLoaded', () => {
 
     document.getElementById('statusModal').addEventListener('hidden.bs.modal', async () => {
         try {
-            const response = await fetch('/job-status');
-            const statuses = await response.json();
-            // A notificação será marcada como lida apenas ao fechar o modal
-            // const finalUnreadStatuses = statuses.filter(s =>
-            //     (s.status === 'completed' || s.status === 'failed') && !s.lido
-            // );
-
-            // for (const status of finalUnreadStatuses) {
-            //     await markAsRead(status.uuid);
-            // }
-            // After marking all as read, fetch again to update the count and modal content
             fetchJobStatuses();
         } catch (error) {
             console.error('Erro ao marcar notificações como lidas ao fechar o modal:', error);
@@ -262,7 +247,6 @@ document.addEventListener('DOMContentLoaded', () => {
         try {
             const response = await fetch('/job-status');
             const statuses = await response.json();
-            // console.log('Status recebidos do backend:', statuses); // Removido o LOG
             updateStatusModal(statuses);
             updateStatusCount(statuses);
         } catch (error) {
@@ -302,7 +286,7 @@ document.addEventListener('DOMContentLoaded', () => {
                     <p class="mb-0">${status.message}</p>
                     <small class="text-muted">${new Date(status.created_at).toLocaleString()}</small>
                 </div>
-                ${(status.status === 'completed' || status.status === 'failed') ? `<button type="button" class="btn btn-sm btn-lg confirm-read-btn" data-uuid="${status.uuid}">
+                ${(status.status === 'completed' || status.status === 'failed') ? `<button type="button" class="btn btn-lg confirm-read-btn" data-uuid="${status.uuid}">
                     <i class="bi bi-check2-square"></i>
                 </button>` : ''}
             `;
@@ -311,10 +295,7 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     // Nova função para confirmar leitura e remover
-    async function confirmReadStatusAndRemove(uuid) {
-        if (!confirm('Tem certeza que deseja confirmar a leitura desta notificação?')) {
-            return;
-        }
+    async function deleteStatus(uuid) {
         try {
             const response = await fetch(`/job-status/${uuid}`, {
                 method: 'DELETE',
@@ -324,16 +305,26 @@ document.addEventListener('DOMContentLoaded', () => {
                 }
             });
 
-            if (response.ok) {
-                showToast('Leitura confirmada com sucesso!', 'success');
-                fetchJobStatuses(); // Atualiza a lista após a exclusão
-            } else {
+            if (!response.ok) {
                 const errorData = await response.json();
                 showToast(`Erro ao confirmar leitura: ${errorData.message || 'Erro desconhecido'}`, 'error');
+                return false; // Indicate failure
             }
+            return true; // Indicate success
         } catch (error) {
             console.error(`Erro ao confirmar leitura e remover status ${uuid}:`, error);
             showToast('Erro de rede ao confirmar leitura.', 'error');
+            return false; // Indicate failure
+        }
+    }
+
+    async function confirmReadStatusAndRemove(uuid) {
+        if (confirm('Tem certeza que deseja confirmar a leitura desta notificação?')) {
+            const success = await deleteStatus(uuid);
+            if (success) {
+                showToast('Leitura confirmada com sucesso!', 'success');
+                fetchJobStatuses(); // Atualiza a lista após a exclusão
+            }
         }
     }
 
@@ -353,6 +344,35 @@ document.addEventListener('DOMContentLoaded', () => {
         checkStatusBtn.addEventListener('click', () => {
             fetchJobStatuses();
             statusModal.show();
+        });
+    }
+
+    const readAllNotificationsBtn = document.getElementById('readAllNotificationsBtn');
+    if (readAllNotificationsBtn) {
+        readAllNotificationsBtn.addEventListener('click', async () => {
+            if (!confirm('Tem certeza que deseja marcar todas as notificações como lidas?')) {
+                return;
+            }
+
+            try {
+                const response = await fetch('/job-status');
+                const statuses = await response.json();
+
+                const completedOrFailedStatuses = statuses.filter(s =>
+                    s.status === 'completed' || s.status === 'failed'
+                );
+
+                for (const status of completedOrFailedStatuses) {
+                    await deleteStatus(status.uuid);
+                }
+                
+                showToast('Todas as notificações foram marcadas como lidas.', 'success');
+                fetchJobStatuses();
+
+            } catch (error) {
+                console.error('Erro ao marcar todas as notificações como lidas:', error);
+                showToast('Erro ao marcar todas as notificações como lidas.', 'error');
+            }
         });
     }
 

@@ -66,6 +66,7 @@
                     <!-- Statuses serão carregados aqui -->
                 </div>
                 <div class="modal-footer">
+                    <button type="button" class="btn btn-primary" id="readAllNotificationsBtn">Ler todas as notificações</button>
                     <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Fechar</button>
                 </div>
             </div>
