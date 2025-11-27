@@ -2,31 +2,27 @@
 
 namespace App\Http\Controllers\NotaFiscal;
 
-use App\Exceptions\NotaJaExistente;
-use App\Gateways\SaveReceiptDataGateway;
 use App\Http\Controllers\Controller;
-use App\Services\OcrService;
 use Exception;
 use App\Jobs\ProcessReceiptJob;
+use Illuminate\Http\JsonResponse;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Validation\ValidationException;
-use Illuminate\Http\JsonResponse;
-use Illuminate\Support\Facades\Storage; // Adicionado para manipulação de arquivos
-use App\Models\JobStatus; // Adicionado
-use Illuminate\Support\Str; // Adicionado para UUID
+use App\Models\JobStatus;
+use Illuminate\Support\Str;
 
 class UploadReceiptController extends Controller
 {
     /**
      * Processa a requisição de upload da imagem.
      * @param Request $request
-     * @return RedirectResponse|\Illuminate\Http\JsonResponse
+     * @return RedirectResponse|JsonResponse
      */
     public function __invoke(
         Request $request
-    ): RedirectResponse|\Illuminate\Http\JsonResponse {
+    ): RedirectResponse|JsonResponse {
         try {
             // A validação de Illuminate\Http\Request lança ValidationException.
             $request->validate(['nota_imagem' => 'required|file|mimes:jpeg,png,webp|max:5120']);
@@ -39,7 +35,7 @@ class UploadReceiptController extends Controller
         }
 
         $imageFile = $request->file('nota_imagem');
-        
+
         try {
             // Salva o arquivo temporariamente e obtém o caminho
             $path = $imageFile->store('receipt_uploads', 'private'); // 'private' disk para arquivos temporários

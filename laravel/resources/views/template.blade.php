@@ -21,7 +21,7 @@
                 class="navbar-brand"
                 style="margin: 0;padding: 0;"
                 href="{{route('view.home')}}"
-            ><img style="height: 27px;" src="{{ asset('img/content.png') }}" alt="">finAI</a>
+            ><img style="height: 40px;margin-right: 10px" src="{{ asset('img/content.png') }}" alt="">finAI</a>
             <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Alternar navegação">
                 <span class="navbar-toggler-icon"></span>
             </button>
