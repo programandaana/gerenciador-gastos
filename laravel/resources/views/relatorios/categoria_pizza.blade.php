@@ -34,19 +34,20 @@
         src="https://cdn.jsdelivr.net/npm/chartjs-plugin-datalabels@2.0.0/dist/chartjs-plugin-datalabels.min.js"></script>
 
     <script>
+        const fixedColors = [
+            "#3366CC", "#DC3912", "#FF9900", "#109618",
+            "#990099", "#0099C6", "#DD4477", "#66AA00",
+            "#B82E2E", "#316395", "#994499", "#22AA99",
+        ];
+
+        function generateColors(count) {
+            return fixedColors.slice(0, count);
+        }
+
         Chart.register(ChartDataLabels);
 
         // 2. Transfere os dados do PHP para o JavaScript
         const dadosGrafico = @json($relatorio_categoria_pizza['dadosGrafico']);
-
-        // Gera cores aleatórias para o gráfico (opcional, mas recomendado para pizza)
-        function generateColors(count) {
-            let colors = [];
-            for (let i = 0; i < count; i++) {
-                colors.push('hsl(' + Math.random() * 360 + ', 70%, 50%)');
-            }
-            return colors;
-        }
 
         const ctx = document.getElementById('graficoPizzaGastos').getContext('2d');
 

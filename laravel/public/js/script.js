@@ -1,33 +1,8 @@
+let requestUrl = window.location.href;
+requestUrl = requestUrl.split(window.location.pathname)[0];
+console.log(requestUrl);
+
 document.addEventListener('DOMContentLoaded', () => {
-    const themeToggleButton = document.getElementById('theme-toggle');
-    const themeIcon = document.getElementById('theme-icon');
-    const currentTheme = localStorage.getItem('theme') || 'light';
-
-    // Aplica o tema salvo ao carregar a página
-    if (currentTheme === 'dark') {
-        document.body.classList.add('dark-mode');
-        if(themeIcon) themeIcon.textContent = '🌙';
-    } else {
-        if(themeIcon) themeIcon.textContent = '☀️';
-    }
-
-    if(themeToggleButton) {
-        themeToggleButton.addEventListener('click', () => {
-            // Alterna a classe no body
-            document.body.classList.toggle('dark-mode');
-
-            // Verifica qual tema está ativo e salva no localStorage
-            let theme = 'light';
-            if (document.body.classList.contains('dark-mode')) {
-                theme = 'dark';
-                if(themeIcon) themeIcon.textContent = '🌙'; // Lua
-            } else {
-                if(themeIcon) themeIcon.textContent = '☀️'; // Sol
-            }
-            localStorage.setItem('theme', theme);
-        });
-    }
-
     // Function to display Bootstrap toasts
     function showToast(message, type = 'success') {
         const toastContainer = document.querySelector('.toast-container');
@@ -96,7 +71,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
     const uploadForm = document.querySelector('form[data-receipt-upload-url]');
     if (uploadForm) {
-        const actionUrl = uploadForm.dataset.receiptUploadUrl;
+        // const actionUrl = uploadForm.dataset.receiptUploadUrl;
         const submitButton = uploadForm.querySelector('button[type="submit"]');
 
         uploadForm.addEventListener('submit', async (event) => {
@@ -112,7 +87,7 @@ document.addEventListener('DOMContentLoaded', () => {
             const formData = new FormData(uploadForm);
 
             try {
-                const response = await fetch(actionUrl, {
+                const response = await fetch(requestUrl + '/receipt', {
                     method: 'POST',
                     body: formData,
                     headers: {
@@ -177,7 +152,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // Function to start polling for job status
     function startPollingForJobStatus(jobStatusUuid) {
-        const pollInterval = 3000; // Poll every 3 seconds
+        const pollInterval = 5000; // Poll every 5 seconds
         let pollingAttempts = 0;
         const maxPollingAttempts = 60; // Max 60 attempts = 3 minutes
 
@@ -191,7 +166,7 @@ document.addEventListener('DOMContentLoaded', () => {
             }
 
             try {
-                const response = await fetch(`/job-status/${jobStatusUuid}`);
+                const response = await fetch(`${requestUrl}/job-status/${jobStatusUuid}`);
                 const jobStatus = await response.json();
 
                 if (response.ok && jobStatus && jobStatus.status) {
@@ -245,7 +220,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
     async function fetchJobStatuses() {
         try {
-            const response = await fetch('/job-status');
+            const response = await fetch(`${requestUrl}/job-status`);
             const statuses = await response.json();
             updateStatusModal(statuses);
             updateStatusCount(statuses);
@@ -284,7 +259,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 <div>
                     <p class="mb-0"><strong>Status:</strong> ${translatedStatus}</p>
                     <p class="mb-0">${status.message}</p>
-                    <small class="text-muted">${new Date(status.created_at).toLocaleString()}</small>
+                    <small class="text-muted">${status.created_at}</small>
                 </div>
                 ${(status.status === 'completed' || status.status === 'failed') ? `<button type="button" class="btn btn-lg confirm-read-btn" data-uuid="${status.uuid}">
                     <i class="bi bi-check2-square"></i>
@@ -297,7 +272,7 @@ document.addEventListener('DOMContentLoaded', () => {
     // Nova função para confirmar leitura e remover
     async function deleteStatus(uuid) {
         try {
-            const response = await fetch(`/job-status/${uuid}`, {
+            const response = await fetch(`${requestUrl}/job-status/${uuid}`, {
                 method: 'DELETE',
                 headers: {
                     'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]')?.getAttribute('content'),
@@ -355,7 +330,7 @@ document.addEventListener('DOMContentLoaded', () => {
             }
 
             try {
-                const response = await fetch('/job-status');
+                const response = await fetch(`${requestUrl}/job-status`);
                 const statuses = await response.json();
 
                 const completedOrFailedStatuses = statuses.filter(s =>
@@ -365,7 +340,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 for (const status of completedOrFailedStatuses) {
                     await deleteStatus(status.uuid);
                 }
-                
+
                 showToast('Todas as notificações foram marcadas como lidas.', 'success');
                 fetchJobStatuses();
 

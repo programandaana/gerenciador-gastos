@@ -23,7 +23,7 @@ Route::get('receipt/upload', fn() => view('receipt.upload'))
 Route::post('receipt', UploadReceiptController::class)
     ->name('receipt.upload');
 
-Route::delete('receipt/{id}', [DeleteNotaFiscalController::class, '__invoke'])->name('receipt.delete');
+Route::delete('receipt/{id}', DeleteNotaFiscalController::class)->name('receipt.delete');
 
 Route::get('notas-fiscais', ListarNotasFiscaisController::class)
     ->name('view.receipt.list');

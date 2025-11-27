@@ -75,7 +75,7 @@ class OcrService
                         'total_item_value' => ['type' => 'number'],
                         'category_name' => [
                             'type'        => 'string',
-                            'description' => 'Classifique o produto usando ALIMENTOS, BEBIDAS, LIMPEZA, HIGIENE ou OUTROS; se nenhuma categoria servir, crie uma nova categoria clara e geral, no mesmo formato.'
+                            'description' => 'Classifique o produto em: ALIMENTOS, BEBIDAS, LIMPEZA, HIGIENE ou OUTROS. Se não se encaixar, crie uma nova categoria curta e geral, seguindo o mesmo estilo.'
                         ],
                     ]
                 ]

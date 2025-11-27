@@ -53,13 +53,5 @@
 @endsection
 
 @push('scripts')
-    <script>
-        // Script para atualizar os campos hidden e submeter ao mudar o SELECT
-        document.getElementById('mes_ano').addEventListener('change', function() {
-            const [m, a] = this.value.split('-');
-            document.getElementById('filtro_mes').value = m;
-            document.getElementById('filtro_ano').value = a;
-            this.form.submit();
-        });
-    </script>
+
 @endpush

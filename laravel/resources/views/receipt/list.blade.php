@@ -16,6 +16,7 @@
             <table class="table table-striped table-hover">
                 <thead>
                 <tr>
+                    <th>#</th>
                     <th>Chave de Acesso</th>
                     <th>Estabelecimento</th>
                     <th class="text-center">Emissão</th>
@@ -27,6 +28,7 @@
                 {{-- Verifica se há notas para listar --}}
                 @forelse ($notasFiscais as $nota)
                     <tr>
+                        <td>{{ $nota->id }}</td>
                         <td>{{ $nota->chave_acesso }}</td>
                         <td>{{ $nota->estabelecimento->nome ?? 'Estabelecimento Não Encontrado' }}</td>
                         <td class="text-center">{{ date('d/m/Y', strtotime($nota->data_emissao)) }}</td>
@@ -47,7 +49,7 @@
                     </tr>
                 @empty
                     <tr>
-                        <td colspan="5" class="text-center">Nenhuma nota fiscal foi processada ainda.</td>
+                        <td colspan="6" class="text-center">Nenhuma nota fiscal foi processada ainda.</td>
                     </tr>
                 @endforelse
                 </tbody>
