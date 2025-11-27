@@ -13,15 +13,24 @@
     <link href="{{ asset('css/style.css', app()->isProduction()) }}" rel="stylesheet">
 </head>
 <body>
-
+<style>
+    .green {
+        color: #1f836c;
+        border-bottom: 2px solid #1f836c;
+    }
+</style>
 <div>
     <nav class="navbar navbar-expand-lg bg-body-tertiary">
         <div class="container-fluid">
             <a
                 class="navbar-brand"
-                style="margin: 0;padding: 0;"
+                style="padding: 0;margin: 0 10px 0 0;"
                 href="{{route('view.home')}}"
-            ><img style="height: 40px;margin-right: 10px" src="{{ asset('img/content.png') }}" alt="">finAI</a>
+            ><img
+                    style="height: 40px;margin-right: 10px"
+                    src="{{ asset('img/content.png') }}"
+                    alt=""
+                >finAI</a>
             <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Alternar navegação">
                 <span class="navbar-toggler-icon"></span>
             </button>
@@ -29,7 +38,7 @@
                 <ul class="navbar-nav">
                     <li class="nav-item">
                         <a
-                            class="nav-link {{ request()->routeIs('view.home') ? 'active' : '' }}"
+                            class="nav-link {{ request()->routeIs('view.home') ? 'green' : '' }}"
                             aria-current="page"
                             href="{{ route('view.home') }}"
                         >Início</a>
@@ -37,7 +46,7 @@
 
                     <li class="nav-item">
                         <a
-                            class="nav-link {{ request()->routeIs('view.receipt.*') ? 'active' : '' }}"
+                            class="nav-link {{ request()->routeIs('view.receipt.*') ? 'green' : '' }}"
                             href="{{ route('view.receipt.list') }}"
                         >Notas Fiscais</a>
                     </li>
