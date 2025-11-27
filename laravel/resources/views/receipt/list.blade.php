@@ -36,6 +36,13 @@
                             <a href="{{route('view.receipt.read', $nota->id)}}" class="btn btn-sm btn-success">
                                 <i class="bi bi-card-checklist"></i> Ver Detalhes
                             </a>
+                            <form action="{{ route('receipt.delete', $nota->id) }}" method="POST" style="display:inline;" onsubmit="return confirm('Tem certeza que deseja remover esta nota fiscal?');">
+                                @csrf
+                                @method('DELETE')
+                                <button type="submit" class="btn btn-sm btn-danger">
+                                    <i class="bi bi-trash"></i>
+                                </button>
+                            </form>
                         </td>
                     </tr>
                 @empty

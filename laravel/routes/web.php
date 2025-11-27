@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\HomeController;
+use App\Http\Controllers\NotaFiscal\DeleteNotaFiscalController;
 use App\Http\Controllers\NotaFiscal\ListarNotasFiscaisController;
 use App\Http\Controllers\NotaFiscal\ReadNotaFiscal;
 use App\Http\Controllers\NotaFiscal\UploadReceiptController;
@@ -21,6 +22,8 @@ Route::get('receipt/upload', fn() => view('receipt.upload'))
 // Receipt
 Route::post('receipt', UploadReceiptController::class)
     ->name('receipt.upload');
+
+Route::delete('receipt/{id}', [DeleteNotaFiscalController::class, '__invoke'])->name('receipt.delete');
 
 Route::get('notas-fiscais', ListarNotasFiscaisController::class)
     ->name('view.receipt.list');
