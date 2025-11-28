@@ -1,10 +1,10 @@
-# Desesenvolvedores: 
-William Trindade https://github.com/williamtrindade
-Jordan Durante https://github.com/JordanDurante
+# FinAI - Gerenciador de Gastos em compras no Mercado - Para Clientes Finais
 
-# Conceito e Pesquisa de Mercado
-William Trindade
-Analissa do Prado https://github.com/programandaana
+"Ajudando a economizar no dia-a-dia para realizar seus sonhos"
+
+# Resumo do aplicativo
+
+Com o auxílio da Inteligência Artificial, é feita a leitura da chave de acesso através da foto tirada pelo celular, então através dela se discrimina, categoriza todos os itens comprados e através do painel é possível ver onde se concentram os gastos
 
 # Arquitetura Mínima: 
 
@@ -17,7 +17,15 @@ Analissa do Prado https://github.com/programandaana
 | Banco de dados                        | PostgreSQL                   | Armazenar dados das notas                              |
 | Dashboard web simples                 | Laravel (PHP)                | Mostrar categorias e valores totais                    |
 
+# Desesenvolvedores: 
+William Trindade https://github.com/williamtrindade
 
+Jordan Durante https://github.com/JordanDurante
+
+# Conceito e Pesquisa de Mercado
+William Trindade
+
+Analissa do Prado https://github.com/programandaana
 
 
 Trabalho desenvolvido em virtude da proposta elaborada pelo Professor Rafael Milbradt - Curso de Sistemas Para Internet - Politécnico UFSM
